@@ -1,6 +1,6 @@
 ---
 title: "Data wrangling"
-author: "My name"
+author: "Andrea Tsilogiannis"
 date: "2025-10-13"
 output: html_document
 editor: source
@@ -19,7 +19,21 @@ The first part does not require joins or pivots.
 Assign to the name `judgments` and correct the column types where needed.
 
 ```{r}
-# Write your answer here
+judgements <- readr::read_delim("data/judgements.tsv",
+             col_types = 
+               cols(start_date = col_date(format = "%d/%m/%Y"),
+                    end_date = col_date(format =  "%d/%m/%Y"),
+                    finished = "f",
+                    condition = "f",
+                    gender = "f",
+                    logbook = "c", 
+                    exclude = "f",
+                    moral_judgment = "d",
+                    moral_judgment_disgust = "d",
+                    moral_judgment_non_disgust = "d",
+                    .default = col_integer()))
+
+judgements
 ```
 
 
@@ -36,27 +50,36 @@ You can combine the following tasks into a single statement.
 Select `gender`, `subject`, `age` and referring to the `STAI` questionnaire.
 
 ```{r}
-# Write your answer here
+judgements |> 
+  dplyr::select(gender, subject, age, starts_with("STAI"))
 ```
 
 
 #### Select all subjects with `STAI_pre` greater than 65 and `STAI_post` greater than 40
 
 ```{r}
-# Write your answer here
+judgements |> 
+  filter(age < 20 & condition == "stress")
+
+judgements |> 
+  filter(STAI_pre > 65 & STAI_post > 40)
+  
 ```
 
 
 #### Sort the observations by `STAI_pre` so that the subject with the highest score is on top.
 
 ```{r}
-# Write your answer here
+judgements |> 
+  arrange(desc(STAI_pre))
 ```
 
 #### For better readability, move the subject, STAI_pre and STAI_post columns to the first positions.
 
 ```{r}
-# Write your answer here
+judgements |> 
+  arrange(desc(STAI_pre)) |> 
+  relocate(subject, STAI_pre, STAI_post)
 ```
 
 #### Check if the data set contains duplicated rows
@@ -68,7 +91,9 @@ in a de-duplicated table containing unique rows only.
 :::
 
 ```{r}
-# Your answer in code here
+judgements |> 
+  distinct() |> 
+  nrow()
 ```
 
 
@@ -88,14 +113,26 @@ It should contain "low", "normal" and "high" entries depending on the `STAI_pre`
 #### Arrange the table by `STAI_pre` in a descending manner.
 
 ```{r}
-# Write your answer here
+judgements |> 
+  mutate(STAI_pre_category = case_when(
+    STAI_pre < 25 ~ "low",
+    STAI_pre > 65 ~ "high",
+    .default = "normal"
+  )) |> 
+  arrange(desc(STAI_pre))
 ```
 
 
 ### Display distinct values in `STAI_pre` and `STAI_pre_category`.
 
 ```{r}
-# Write your answer here
+judgements |> 
+  mutate(STAI_pre_category = case_when(
+    STAI_pre < 25 ~ "low",
+    STAI_pre > 65 ~ "high",
+    .default = "normal"
+  )) |> 
+  distinct(STAI_pre, STAI_pre_category)
 ```
 
 
@@ -103,7 +140,9 @@ It should contain "low", "normal" and "high" entries depending on the `STAI_pre`
 Divide all entries in the REI questionnaire by 5, the maximal value.
 
 ```{r}
-# Write your answer here
+judgements |> 
+  mutate(across(contains("REI"), `/`, 5)) |> 
+  select(starts_with("REI"))
 ```
 
 
