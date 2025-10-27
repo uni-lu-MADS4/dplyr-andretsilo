@@ -17,7 +17,18 @@ Find meaningful short names for the functions such as `med` for  the median.
 Assign `judgments_condition_stats` to the results.
 
 ```{r}
-# Write your answer here
+
+judgements |> 
+  summarise(across(starts_with("moral_dilemma"),
+                   list(
+                   "min" = min,
+                   "max" = max,
+                   "std" = sd,
+                   "mean" = mean,
+                   "med" = median
+                   ))) -> judgements_condition_stats
+judgements_condition_stats
+  
 ```
 
 
@@ -29,7 +40,10 @@ Find the number of subjects by `age`, `gender` and `condition`, e.g. how many 20
 Sort the resulting tibble such that the condition that contains the most populous group is sorted first (i.e. `stress` or `control` appear together). 
 
 ```{r}
-# Write your answer here
+judgements |> 
+  group_by(age, gender, condition) |> 
+  count() |> 
+  ungroup()
 ```
 
 Ensure that the resulting tibble does not contain groups.
